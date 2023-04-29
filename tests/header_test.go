@@ -30,6 +30,20 @@ func TestDecodeHeader(t *testing.T) {
 	assert.Equal(t, headerData, headers)
 }
 
+func TestDecodeEmptyHeader(t *testing.T) {
+	var b bytes.Buffer
+
+	reader := bufio.NewReader(&b)
+
+	headers := map[string]interface{}{}
+
+	header, headerData, err := Message.DecodeHeader(reader, uint32(0))
+
+	assert.Equal(t, err, nil)
+	assert.Equal(t, len(header), 0)
+	assert.Equal(t, headerData, headers)
+}
+
 func TestEncodeHeader(t *testing.T) {
 
 	header := map[string]interface{}{

@@ -9,7 +9,7 @@ import (
 
 func DecodeHeader(r io.Reader, headerLength uint32) ([]byte, map[string]interface{}, error) {
 	if headerLength == 0 {
-		return nil, nil, nil
+		return []byte{}, map[string]interface{}{}, nil
 	}
 
 	header := make([]byte, headerLength)
