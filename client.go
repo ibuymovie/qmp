@@ -11,20 +11,20 @@ import (
 var ClientVersion = 1
 
 type Client struct {
-	address   string
+	Address   string
 	connector *Connector
 	Messages  chan *Message.Message
 }
 
 func NewClient(address string) *Client {
 	return &Client{
-		address:  address,
+		Address:  address,
 		Messages: make(chan *Message.Message),
 	}
 }
 
 func (c *Client) Run() error {
-	ip, err := net.Dial("tcp", c.address)
+	ip, err := net.Dial("tcp", c.Address)
 	if err != nil {
 		return err
 	}

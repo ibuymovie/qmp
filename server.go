@@ -14,6 +14,7 @@ var ServerVersion = 1
 type Server struct {
 	port       int
 	connectors []*Connector
+	listener   net.Listener
 }
 
 func NewServer(port int) *Server {
@@ -23,13 +24,15 @@ func NewServer(port int) *Server {
 }
 
 func (s *Server) Run() error {
-	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", s.port))
+	var err error
+
+	s.listener, err = net.Listen("tcp", fmt.Sprintf(":%d", s.port))
 	if err != nil {
 		return err
 	}
 
 	for {
-		conn, err := ln.Accept()
+		conn, err := s.listener.Accept()
 
 		if err != nil {
 			return err
@@ -104,4 +107,12 @@ func (s *Server) SendMessageToAll(message *Message.Message) {
 			connector.Write <- message
 		}
 	}()
+}
+
+func (s *Server) Close() {
+	for _, connector := range s.connectors {
+		connector.CloseConn()
+	}
+
+	_ = s.listener.Close()
 }
