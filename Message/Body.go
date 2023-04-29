@@ -37,3 +37,25 @@ func DecodeBody(r io.Reader, bodyLength uint32, messageType MessageType) ([]byte
 		return nil, nil, errors.New("message type not allowed")
 	}
 }
+
+func EncodeBody(w io.Writer, data interface{}, messageType MessageType) error {
+	switch messageType {
+	case Empty:
+		return nil
+	case String:
+		_, _ = w.Write([]byte(data.(string)))
+		return nil
+	case Json:
+		body, err := json.Marshal(data)
+		if err != nil {
+			return err
+		}
+		_, _ = w.Write(body)
+		return nil
+	case Amf0:
+		_, err := amf.EncodeAMF0(w, data)
+		return err
+	default:
+		return errors.New("message type not allowed")
+	}
+}

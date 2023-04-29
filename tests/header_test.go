@@ -26,12 +26,7 @@ func TestDecodeHeader(t *testing.T) {
 	header, err := Message.DecodeHeader(reader, uint32(length))
 
 	assert.Equal(t, err, nil)
-	switch header.Data.(type) {
-	case map[string]interface{}:
-		break
-	default:
-		panic("header data type error")
-	}
+	assert.Equal(t, header.Data, headers)
 }
 
 func TestDecodeNumberHeader(t *testing.T) {
