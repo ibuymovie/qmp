@@ -12,6 +12,7 @@ var (
 	String MessageType = 1
 	Json   MessageType = 2
 	Amf0   MessageType = 3
+	Byte   MessageType = 4
 )
 
 type Message struct {

@@ -35,6 +35,8 @@ func DecodeBody(r io.Reader, bodyLength uint32, messageType MessageType) ([]byte
 			return nil, nil, err
 		}
 		return buf, data, nil
+	case Byte:
+		return buf, buf, nil
 	default:
 		return nil, nil, errors.New("message type not allowed")
 	}
@@ -66,6 +68,8 @@ func EncodeBody(data interface{}, messageType MessageType) ([]byte, error) {
 		buf := make([]byte, length)
 		_, _ = reader.Read(buf)
 		return buf, nil
+	case Byte:
+		return data.([]byte), nil
 	default:
 		return nil, errors.New("message type not allowed")
 	}

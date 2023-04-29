@@ -63,6 +63,7 @@
 | 1      | String message |
 | 2      | JSON message   |
 | 3      | amf0 message   |
+| 4      | byte message   |
 
 ### Header
 
