@@ -1,6 +1,8 @@
 package Message
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"github.com/StounhandJ/go-amf"
@@ -38,24 +40,33 @@ func DecodeBody(r io.Reader, bodyLength uint32, messageType MessageType) ([]byte
 	}
 }
 
-func EncodeBody(w io.Writer, data interface{}, messageType MessageType) error {
+func EncodeBody(data interface{}, messageType MessageType) ([]byte, error) {
 	switch messageType {
 	case Empty:
-		return nil
+		return []byte{}, nil
 	case String:
-		_, _ = w.Write([]byte(data.(string)))
-		return nil
+		return []byte(data.(string)), nil
 	case Json:
 		body, err := json.Marshal(data)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		_, _ = w.Write(body)
-		return nil
+		return body, nil
 	case Amf0:
-		_, err := amf.EncodeAMF0(w, data)
-		return err
+		var b bytes.Buffer
+
+		writer := bufio.NewWriter(&b)
+		reader := bufio.NewReader(&b)
+		length, err := amf.EncodeAMF0(writer, data)
+		if err != nil {
+			return nil, err
+		}
+		_ = writer.Flush()
+
+		buf := make([]byte, length)
+		_, _ = reader.Read(buf)
+		return buf, nil
 	default:
-		return errors.New("message type not allowed")
+		return nil, errors.New("message type not allowed")
 	}
 }

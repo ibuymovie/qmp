@@ -1,43 +1,45 @@
 package Message
 
 import (
+	"bufio"
+	"bytes"
 	"github.com/StounhandJ/go-amf"
 	"io"
 )
 
-type Header struct {
-	bodyLength int
-	body       []byte
-	Data       interface{}
+func DecodeHeader(r io.Reader, headerLength uint32) ([]byte, interface{}, error) {
+	if headerLength == 0 {
+		return nil, nil, nil
+	}
+
+	header := make([]byte, headerLength)
+
+	if _, err := io.ReadAtLeast(r, header[:], int(headerLength)); err != nil {
+		return nil, nil, err
+	}
+
+	headerData, _, err := amf.DecodeAMF0(header)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return header, headerData, nil
 }
 
-func DecodeHeader(r io.Reader, headerLength uint32) (*Header, error) {
-	if headerLength == 0 {
-		return nil, nil
-	}
-	h := &Header{}
+func EncodeHeader(header interface{}) ([]byte, error) {
 
-	buf := make([]byte, headerLength)
+	var b bytes.Buffer
 
-	if _, err := io.ReadAtLeast(r, buf[:], int(headerLength)); err != nil {
-		return nil, err
-	}
-
-	h.body = buf[:]
-
-	result, _, err := amf.DecodeAMF0(h.body)
-
+	writer := bufio.NewWriter(&b)
+	reader := bufio.NewReader(&b)
+	length, err := amf.EncodeAMF0(writer, header)
 	if err != nil {
 		return nil, err
 	}
+	_ = writer.Flush()
 
-	h.Data = result
-
-	return h, nil
-}
-
-func (h *Header) EncodeHeader(w io.Writer) error {
-	_, err := amf.EncodeAMF0(w, h.Data)
-
-	return err
+	buf := make([]byte, length)
+	_, _ = reader.Read(buf)
+	return buf, nil
 }

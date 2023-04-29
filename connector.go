@@ -13,15 +13,17 @@ type Connector struct {
 	reader *bufio.Reader
 	Write  chan *Message.Message
 	Read   chan *Message.Message
+	Close  chan bool
 }
 
-func NewConnector(con net.Conn) *Connector {
+func newConnector(con net.Conn) *Connector {
 	return &Connector{
 		con:    con,
 		writer: bufio.NewWriter(con),
 		reader: bufio.NewReader(con),
-		Write:  make(chan *Message.Message),
-		Read:   make(chan *Message.Message),
+		Write:  make(chan *Message.Message, 100),
+		Read:   make(chan *Message.Message, 100),
+		Close:  make(chan bool, 1),
 	}
 }
 
@@ -32,7 +34,7 @@ func (c *Connector) RunRead() {
 			continue
 		}
 
-		fmt.Println(message)
+		c.Read <- message
 	}
 }
 
@@ -45,8 +47,15 @@ func (c *Connector) RunWrite() {
 		}
 		err = c.writer.Flush()
 		if err != nil {
-			fmt.Println(err)
+			c.CloseConn()
 			return
 		}
 	}
+}
+
+func (c *Connector) CloseConn() {
+	_ = c.con.Close()
+	close(c.Write)
+	close(c.Read)
+	c.Close <- true
 }

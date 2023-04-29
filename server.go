@@ -34,6 +34,7 @@ func (s *Server) Run() error {
 		if err != nil {
 			return err
 		}
+		fmt.Println("New connection", conn.RemoteAddr())
 
 		go func() {
 			err := s.createConnector(conn)
@@ -50,10 +51,14 @@ func (s *Server) createConnector(conn net.Conn) error {
 		return err
 	}
 
-	c := NewConnector(conn)
+	c := newConnector(conn)
 
 	go c.RunRead()
 	go c.RunWrite()
+	go func() {
+		<-c.Close
+		s.closeConnector(c)
+	}()
 
 	s.connectors = append(s.connectors, c)
 
@@ -84,8 +89,19 @@ func (s *Server) handshakeWithClient(w *bufio.Writer, r *bufio.Reader) error {
 	return nil
 }
 
-func (s *Server) SendMessageToAll(message *Message.Message) {
-	for _, connector := range s.connectors {
-		connector.Write <- message
+func (s *Server) closeConnector(connector *Connector) {
+	for i, c := range s.connectors {
+		if c == connector {
+			s.connectors = append(s.connectors[:i], s.connectors[i+1:]...)
+			fmt.Println("Close connection", connector.con.RemoteAddr())
+		}
 	}
+}
+
+func (s *Server) SendMessageToAll(message *Message.Message) {
+	go func() {
+		for _, connector := range s.connectors {
+			connector.Write <- message
+		}
+	}()
 }

@@ -11,19 +11,20 @@ import (
 var ClientVersion = 1
 
 type Client struct {
-	address   *net.IPAddr
+	address   string
 	connector *Connector
 	Messages  chan *Message.Message
 }
 
-func NewClient(address *net.IPAddr) *Client {
+func NewClient(address string) *Client {
 	return &Client{
-		address: address,
+		address:  address,
+		Messages: make(chan *Message.Message),
 	}
 }
 
 func (c *Client) Run() error {
-	ip, err := net.ListenIP("tcp", c.address)
+	ip, err := net.Dial("tcp", c.address)
 	if err != nil {
 		return err
 	}
@@ -33,11 +34,15 @@ func (c *Client) Run() error {
 		return err
 	}
 
-	c.connector = NewConnector(ip)
-	c.Messages = c.connector.Read
+	c.connector = newConnector(ip)
 
 	go c.connector.RunRead()
 	go c.connector.RunWrite()
+	go func() {
+		for {
+			c.Messages <- <-c.connector.Read
+		}
+	}()
 
 	return nil
 }

@@ -18,9 +18,17 @@ type Message struct {
 	MessageType  MessageType // 2 bytes //
 	BodyLength   uint32      // 4 bytes //
 	HeaderLength uint32      // 4 bytes //
-	Header       *Header
+	header       []byte
+	HeaderData   interface{}
 	body         []byte
 	BodyData     interface{}
+}
+
+func NewMessage(messageType MessageType, BodyData interface{}) *Message {
+	return &Message{
+		MessageType: messageType,
+		BodyData:    BodyData,
+	}
 }
 
 func DecodeMessage(r io.Reader) (*Message, error) {
@@ -29,7 +37,7 @@ func DecodeMessage(r io.Reader) (*Message, error) {
 		return nil, err
 	}
 
-	m.Header, err = DecodeHeader(r, m.HeaderLength)
+	m.header, m.HeaderData, err = DecodeHeader(r, m.HeaderLength)
 	if err != nil {
 		return nil, err
 	}
@@ -66,16 +74,30 @@ func DecodeSetup(r io.Reader) (*Message, error) {
 }
 
 func (mes *Message) EncodeMessage(writer io.Writer) error {
+	var header, body []byte
+	var err error
+
+	if header, err = EncodeHeader(mes.HeaderData); err != nil {
+		return err
+	}
+	mes.header = header
+	mes.HeaderLength = uint32(len(header))
+
+	if body, err = EncodeBody(mes.BodyData, mes.MessageType); err != nil {
+		return err
+	}
+	mes.body = body
+	mes.BodyLength = uint32(len(body))
 
 	if err := mes.EncodeSetup(writer); err != nil {
 		return err
 	}
 
-	if err := mes.Header.EncodeHeader(writer); err != nil {
+	if _, err := writer.Write(mes.header); err != nil {
 		return err
 	}
 
-	if err := EncodeBody(writer, mes.BodyData, mes.MessageType); err != nil {
+	if _, err := writer.Write(mes.body); err != nil {
 		return err
 	}
 
