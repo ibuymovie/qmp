@@ -1,0 +1,81 @@
+package qmp
+
+import (
+	"bufio"
+	"errors"
+	"fmt"
+	"net"
+	"qmp/Handshake"
+)
+
+var Version = 1
+
+type Server struct {
+	port int
+}
+
+func NewServer(port int) *Server {
+	return &Server{
+		port: port,
+	}
+}
+
+func (s *Server) Run() error {
+	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", s.port))
+	if err != nil {
+		return err
+	}
+
+	for {
+		conn, err := ln.Accept()
+
+		if err != nil {
+			return err
+		}
+
+		go func() {
+			err := s.createConnector(conn)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}()
+	}
+}
+
+func (s *Server) createConnector(conn net.Conn) error {
+	err := s.handshakeWithClient(bufio.NewWriter(conn), bufio.NewReader(conn))
+	if err != nil {
+		return err
+	}
+
+	c := NewConnector(conn)
+
+	go c.RunRead()
+	go c.RunWrite()
+
+	return nil
+}
+
+func (s *Server) handshakeWithClient(w *bufio.Writer, r *bufio.Reader) error {
+	// Recv C
+	c, err := Handshake.DecodeSC(r)
+	if err != nil {
+		return err
+	}
+
+	if c.Version > byte(Version) {
+		return errors.New("version non supported")
+	}
+
+	// Send S
+	s0 := Handshake.NewSC(byte(Version))
+
+	if err := s0.EncodeSC(w); err != nil {
+		return err
+	}
+	err = w.Flush()
+	if err != nil {
+		return err
+	}
+	return nil
+}

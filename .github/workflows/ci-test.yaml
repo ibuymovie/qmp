@@ -1,0 +1,34 @@
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  test:
+    strategy:
+      matrix:
+        go-version: [ 1.19 ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+          check-latest: true
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Install tools
+        run: go install github.com/golang/mock/mockgen@v1.6.0
+
+      - name: Install dependencies
+        run: go get .
+
+      - name: Run Tests
+        run: make test
