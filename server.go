@@ -9,7 +9,7 @@ import (
 	"qmp/Message"
 )
 
-var Version = 1
+var ServerVersion = 1
 
 type Server struct {
 	port       int
@@ -67,12 +67,12 @@ func (s *Server) handshakeWithClient(w *bufio.Writer, r *bufio.Reader) error {
 		return err
 	}
 
-	if c.Version > byte(Version) {
+	if c.Version > byte(ServerVersion) {
 		return errors.New("version non supported")
 	}
 
 	// Send S
-	s0 := Handshake.NewSC(byte(Version))
+	s0 := Handshake.NewSC(byte(ServerVersion))
 
 	if err := s0.EncodeSC(w); err != nil {
 		return err
