@@ -65,35 +65,42 @@ func DecodeSetup(r io.Reader) (*Message, error) {
 	return m, nil
 }
 
-func (bh *Message) EncodeMessage(writer io.Writer) error {
-	err := bh.EncodeSetup(writer)
+func (mes *Message) EncodeMessage(writer io.Writer) error {
 
-	if err != nil {
+	if err := mes.EncodeSetup(writer); err != nil {
+		return err
+	}
+
+	if err := mes.Header.EncodeHeader(writer); err != nil {
+		return err
+	}
+
+	if err := EncodeBody(writer, mes.BodyData, mes.MessageType); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (bh *Message) EncodeSetup(writer io.Writer) error {
+func (mes *Message) EncodeSetup(writer io.Writer) error {
 	buf := make([]byte, 8)
 
-	buf[0] = byte(bh.MessageType >> 8)
-	buf[1] = byte(bh.MessageType & 0xff)
+	buf[0] = byte(mes.MessageType >> 8)
+	buf[1] = byte(mes.MessageType & 0xff)
 
 	_, err := writer.Write(buf[:2])
 	if err != nil {
 		return err
 	}
 
-	copy(buf[0:4], utils.Uint32ToByteArray(bh.BodyLength, 4))
+	copy(buf[0:4], utils.Uint32ToByteArray(mes.BodyLength, 4))
 
 	_, err = writer.Write(buf[:4])
 	if err != nil {
 		return err
 	}
 
-	copy(buf[0:4], utils.Uint32ToByteArray(bh.HeaderLength, 4))
+	copy(buf[0:4], utils.Uint32ToByteArray(mes.HeaderLength, 4))
 
 	_, err = writer.Write(buf[:4])
 	if err != nil {

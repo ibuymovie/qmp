@@ -11,8 +11,8 @@ type Connector struct {
 	con    net.Conn
 	writer *bufio.Writer
 	reader *bufio.Reader
-	write  chan *Message.Message
-	read   chan *Message.Message
+	Write  chan *Message.Message
+	Read   chan *Message.Message
 }
 
 func NewConnector(con net.Conn) *Connector {
@@ -20,24 +20,24 @@ func NewConnector(con net.Conn) *Connector {
 		con:    con,
 		writer: bufio.NewWriter(con),
 		reader: bufio.NewReader(con),
-		write:  make(chan *Message.Message),
-		read:   make(chan *Message.Message),
+		Write:  make(chan *Message.Message),
+		Read:   make(chan *Message.Message),
 	}
 }
 
 func (c *Connector) RunRead() {
 	for {
-		chunk, err := Message.DecodeMessage(c.reader)
+		message, err := Message.DecodeMessage(c.reader)
 		if err != nil {
 			continue
 		}
 
-		fmt.Println(chunk)
+		fmt.Println(message)
 	}
 }
 
 func (c *Connector) RunWrite() {
-	for chunk := range c.write {
+	for chunk := range c.Write {
 		err := chunk.EncodeMessage(c.writer)
 		if err != nil {
 			fmt.Println(err)

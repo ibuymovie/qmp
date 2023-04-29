@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"net"
 	"qmp/Handshake"
+	"qmp/Message"
 )
 
 var Version = 1
 
 type Server struct {
-	port int
+	port       int
+	connectors []*Connector
 }
 
 func NewServer(port int) *Server {
@@ -53,6 +55,8 @@ func (s *Server) createConnector(conn net.Conn) error {
 	go c.RunRead()
 	go c.RunWrite()
 
+	s.connectors = append(s.connectors, c)
+
 	return nil
 }
 
@@ -78,4 +82,10 @@ func (s *Server) handshakeWithClient(w *bufio.Writer, r *bufio.Reader) error {
 		return err
 	}
 	return nil
+}
+
+func (s *Server) SendMessageToAll(message *Message.Message) {
+	for _, connector := range s.connectors {
+		connector.Write <- message
+	}
 }

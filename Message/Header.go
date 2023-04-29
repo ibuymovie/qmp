@@ -36,8 +36,8 @@ func DecodeHeader(r io.Reader, headerLength uint32) (*Header, error) {
 	return h, nil
 }
 
-func EncodeHeader(w io.Writer, data interface{}) error {
-	_, err := amf.EncodeAMF0(w, data)
+func (h *Header) EncodeHeader(w io.Writer) error {
+	_, err := amf.EncodeAMF0(w, h.Data)
 
 	return err
 }

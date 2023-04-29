@@ -50,11 +50,8 @@ func TestEncodeHeader(t *testing.T) {
 	writer := bufio.NewWriter(&b)
 	reader := bufio.NewReader(&b)
 
-	headers := 214
-
-	//_, _ := amf.EncodeAMF0(writer, headers)
-
-	err := Message.EncodeHeader(writer, headers)
+	header := Message.Header{Data: 214}
+	err := header.EncodeHeader(writer)
 	_ = writer.Flush()
 
 	res, _ := reader.ReadBytes(1)
