@@ -1,2 +1,4 @@
+github.com/StounhandJ/go-amf v0.0.0-20230215080322-e5a467a5c999 h1:vakS3zSeGPlEKxwHV59YDxu8bOkzCNqRrc8klvyNvFw=
+github.com/StounhandJ/go-amf v0.0.0-20230215080322-e5a467a5c999/go.mod h1:/Yn2YIGhnnHL9VYOvmJZCxSfiDrcSb4rRIQ4or+YJU4=
 github.com/go-playground/assert/v2 v2.2.0 h1:JvknZsQTYeFEAhQwI4qEt9cyV5ONwRHC+lYKSsYSR8s=
 github.com/go-playground/assert/v2 v2.2.0/go.mod h1:VDjEfimB/XKnb+ZQfWdccd7VUvScMdVu0Titje2rxJ4=

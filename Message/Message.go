@@ -5,15 +5,44 @@ import (
 	"qmp/utils"
 )
 
+type MessageType uint16
+
+var (
+	Empty  MessageType = 0
+	String MessageType = 1
+	Json   MessageType = 2
+	Amf0   MessageType = 3
+)
+
 type Message struct {
-	Type         uint16 // 2 bytes //
-	BodyLength   uint32 // 4 bytes //
-	HeaderLength uint32 // 4 bytes //
+	MessageType  MessageType // 2 bytes //
+	BodyLength   uint32      // 4 bytes //
+	HeaderLength uint32      // 4 bytes //
 	Header       *Header
-	Body         []byte
+	body         []byte
+	BodyData     interface{}
 }
 
 func DecodeMessage(r io.Reader) (*Message, error) {
+	m, err := DecodeSetup(r)
+	if err != nil {
+		return nil, err
+	}
+
+	m.Header, err = DecodeHeader(r, m.HeaderLength)
+	if err != nil {
+		return nil, err
+	}
+
+	m.body, m.BodyData, err = DecodeBody(r, m.BodyLength, m.MessageType)
+	if err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+func DecodeSetup(r io.Reader) (*Message, error) {
 	m := &Message{}
 
 	buf := make([]byte, 8)
@@ -21,7 +50,7 @@ func DecodeMessage(r io.Reader) (*Message, error) {
 	if _, err := io.ReadAtLeast(r, buf[:2], 2); err != nil {
 		return nil, err
 	}
-	m.Type = uint16(utils.ByteArrayToUint32(buf[:2]))
+	m.MessageType = MessageType(utils.ByteArrayToUint32(buf[:2]))
 
 	if _, err := io.ReadAtLeast(r, buf[:4], 4); err != nil {
 		return nil, err
@@ -37,10 +66,20 @@ func DecodeMessage(r io.Reader) (*Message, error) {
 }
 
 func (bh *Message) EncodeMessage(writer io.Writer) error {
+	err := bh.EncodeSetup(writer)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (bh *Message) EncodeSetup(writer io.Writer) error {
 	buf := make([]byte, 8)
 
-	buf[0] = byte(bh.Type >> 8)
-	buf[1] = byte(bh.Type & 0xff)
+	buf[0] = byte(bh.MessageType >> 8)
+	buf[1] = byte(bh.MessageType & 0xff)
 
 	_, err := writer.Write(buf[:2])
 	if err != nil {
