@@ -1,8 +1,8 @@
 package Message
 
 import (
+	"github.com/ibuymovie/qmp/utils"
 	"io"
-	"qmp/utils"
 )
 
 type MessageType uint16

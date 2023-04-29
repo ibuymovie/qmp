@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"github.com/StounhandJ/go-amf"
 	"github.com/go-playground/assert/v2"
-	"qmp/Message"
+	"github.com/ibuymovie/qmp/Message"
 	"testing"
 )
 

@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"github.com/ibuymovie/qmp/Handshake"
+	"github.com/ibuymovie/qmp/Message"
 	"net"
-	"qmp/Handshake"
-	"qmp/Message"
 )
 
 var ServerVersion = 1

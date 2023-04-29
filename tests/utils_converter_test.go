@@ -2,7 +2,7 @@ package tests
 
 import (
 	"github.com/go-playground/assert/v2"
-	"qmp/utils"
+	"github.com/ibuymovie/qmp/utils"
 	"testing"
 )
 

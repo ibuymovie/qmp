@@ -1,4 +1,4 @@
-module qmp
+module github.com/ibuymovie/qmp
 
 go 1.20
 

@@ -3,9 +3,9 @@ package qmp
 import (
 	"bufio"
 	"errors"
+	"github.com/ibuymovie/qmp/Handshake"
+	"github.com/ibuymovie/qmp/Message"
 	"net"
-	"qmp/Handshake"
-	"qmp/Message"
 )
 
 var ClientVersion = 1

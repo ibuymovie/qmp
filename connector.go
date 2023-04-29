@@ -3,8 +3,8 @@ package qmp
 import (
 	"bufio"
 	"fmt"
+	"github.com/ibuymovie/qmp/Message"
 	"net"
-	"qmp/Message"
 )
 
 type Connector struct {

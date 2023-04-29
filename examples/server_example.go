@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/ibuymovie/qmp"
+	"github.com/ibuymovie/qmp/Message"
 	"os"
 	"os/signal"
-	"qmp"
-	"qmp/Message"
 	"time"
 )
 

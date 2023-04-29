@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"qmp"
+	"github.com/ibuymovie/qmp"
 )
 
 func main() {
