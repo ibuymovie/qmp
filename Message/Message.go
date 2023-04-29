@@ -20,15 +20,16 @@ type Message struct {
 	BodyLength   uint32      // 4 bytes //
 	HeaderLength uint32      // 4 bytes //
 	header       []byte
-	HeaderData   interface{}
+	HeaderData   map[string]interface{}
 	body         []byte
 	BodyData     interface{}
 }
 
-func NewMessage(messageType MessageType, BodyData interface{}) *Message {
+func NewMessage(messageType MessageType, header map[string]interface{}, bodyData interface{}) *Message {
 	return &Message{
 		MessageType: messageType,
-		BodyData:    BodyData,
+		HeaderData:  header,
+		BodyData:    bodyData,
 	}
 }
 

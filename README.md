@@ -36,9 +36,9 @@
 ## Message Format
 
 ```
- +-------+---------+------+
- | Setup | Header  | Data |
- +-------+---------+------+
+ +-------+--------+------+
+ | Setup | Header | Data |
+ +-------+--------+------+
  |                |
  |<-Chunk Header->|
 ```
@@ -67,7 +67,7 @@
 
 ### Header
 
-It represents data in amf0 format. Depending on the previously set header length, it is necessary to decode them.
+It represents data in amf0 format `map[string]string`. Depending on the previously set header length, it is necessary to decode them.
 
 ### Body
 

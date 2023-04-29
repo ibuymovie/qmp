@@ -7,7 +7,7 @@ import (
 	"io"
 )
 
-func DecodeHeader(r io.Reader, headerLength uint32) ([]byte, interface{}, error) {
+func DecodeHeader(r io.Reader, headerLength uint32) ([]byte, map[string]interface{}, error) {
 	if headerLength == 0 {
 		return nil, nil, nil
 	}
@@ -24,10 +24,10 @@ func DecodeHeader(r io.Reader, headerLength uint32) ([]byte, interface{}, error)
 		return nil, nil, err
 	}
 
-	return header, headerData, nil
+	return header, headerData.(map[string]interface{}), nil
 }
 
-func EncodeHeader(header interface{}) ([]byte, error) {
+func EncodeHeader(header map[string]interface{}) ([]byte, error) {
 
 	var b bytes.Buffer
 
