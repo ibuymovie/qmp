@@ -51,6 +51,10 @@
  +-+--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  |type| body lenght | header lenght   |
  +-+--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |      header(header lenght)         |
+ +-+--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ |        body(body lenght)           |
+ +-+--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ```
 
 - Type (2 bits): initial notification of the type of subsequent message
