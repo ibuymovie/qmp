@@ -72,3 +72,7 @@ func (c *Client) handshakeWithSerer(w *bufio.Writer, r *bufio.Reader) error {
 
 	return nil
 }
+
+func (c *Client) Close() {
+	c.connector.CloseConn()
+}
