@@ -1,4 +1,5 @@
 # QMP - quick message protocol
+- the data protocol is lightweight according to the standard, so it allows you to send small data without unnecessary network costs.  
 
 ## HandShake
 
@@ -65,9 +66,8 @@
 |--------|----------------|
 | 0      | Empty message  |
 | 1      | String message |
-| 2      | JSON message   |
-| 3      | amf0 message   |
-| 4      | byte message   |
+| 2      | amf0 message   |
+| 3      | byte message   |
 
 ### Header
 
