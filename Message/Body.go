@@ -3,7 +3,6 @@ package Message
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"errors"
 	"github.com/StounhandJ/go-amf"
 	"io"
@@ -22,13 +21,6 @@ func DecodeBody(r io.Reader, bodyLength uint32, messageType MessageType) ([]byte
 		return buf, nil, nil
 	case String:
 		return buf, string(buf), nil
-	case Json:
-		data := make(map[string]interface{})
-		err := json.Unmarshal(buf, &data)
-		if err != nil {
-			return nil, nil, err
-		}
-		return buf, data, nil
 	case Amf0:
 		data, _, err := amf.DecodeAMF0(buf)
 		if err != nil {
@@ -48,12 +40,6 @@ func EncodeBody(data interface{}, messageType MessageType) ([]byte, error) {
 		return []byte{}, nil
 	case String:
 		return []byte(data.(string)), nil
-	case Json:
-		body, err := json.Marshal(data)
-		if err != nil {
-			return nil, err
-		}
-		return body, nil
 	case Amf0:
 		var b bytes.Buffer
 

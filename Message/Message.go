@@ -10,9 +10,8 @@ type MessageType uint16
 var (
 	Empty  MessageType = 0
 	String MessageType = 1
-	Json   MessageType = 2
-	Amf0   MessageType = 3
-	Byte   MessageType = 4
+	Amf0   MessageType = 2
+	Byte   MessageType = 3
 )
 
 type Message struct {

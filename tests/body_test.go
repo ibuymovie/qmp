@@ -3,7 +3,6 @@ package tests
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"github.com/StounhandJ/go-amf"
 	"github.com/go-playground/assert/v2"
 	"github.com/ibuymovie/qmp/Message"
@@ -28,28 +27,6 @@ func TestDecodeBodyAmf0(t *testing.T) {
 
 	assert.Equal(t, err, nil)
 	assert.Equal(t, len(body), length)
-	assert.Equal(t, data, sendData)
-}
-
-func TestDecodeBodyJson(t *testing.T) {
-	var b bytes.Buffer
-
-	writer := bufio.NewWriter(&b)
-	reader := bufio.NewReader(&b)
-
-	sendData := map[string]interface{}{
-		"App": "live",
-		"Vid": "1",
-	}
-
-	sendDataJson, _ := json.Marshal(sendData)
-	length, _ := writer.Write(sendDataJson)
-	_ = writer.Flush()
-
-	body, data, err := Message.DecodeBody(reader, uint32(length), Message.Json)
-
-	assert.Equal(t, err, nil)
-	assert.Equal(t, body, sendDataJson)
 	assert.Equal(t, data, sendData)
 }
 
