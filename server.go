@@ -15,6 +15,7 @@ type Server struct {
 	port       int
 	connectors []*Connector
 	listener   net.Listener
+	Messages   chan *Message.Message
 }
 
 func NewServer(port int) *Server {
@@ -61,6 +62,11 @@ func (s *Server) createConnector(conn net.Conn) error {
 	go func() {
 		<-c.Close
 		s.closeConnector(c)
+	}()
+	go func() {
+		for {
+			s.Messages <- <-c.Read
+		}
 	}()
 
 	s.connectors = append(s.connectors, c)

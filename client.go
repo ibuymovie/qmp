@@ -76,3 +76,9 @@ func (c *Client) handshakeWithSerer(w *bufio.Writer, r *bufio.Reader) error {
 func (c *Client) Close() {
 	c.connector.CloseConn()
 }
+
+func (c *Client) SendMessageToServer(message *Message.Message) {
+	go func() {
+		c.connector.Write <- message
+	}()
+}
